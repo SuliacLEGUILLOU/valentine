@@ -1,6 +1,10 @@
 use std::env;
 use bcrypt::{DEFAULT_COST, hash, verify};
 
+/**
+ * Get the optional system salt from the SECRET_SALT variable
+ * It is set to prevent using password in another system
+ */
 fn generate_system_salt() -> String {
     match env::var("SECRET_SALT") {
         Ok(h) => h,
@@ -8,12 +12,18 @@ fn generate_system_salt() -> String {
     }
 }
 
+/**
+ * Hash the provided password
+ */
 pub fn hash_password(pwd: &String) -> String {
     let message = format!("{}{}", generate_system_salt(), pwd);
 
     hash(message, DEFAULT_COST).unwrap()
 }
 
+/**
+ * Verify the provided password
+ */
 pub fn check_password(pwd: &String, hashed: String) -> bool {
     let message = format!("{}{}", generate_system_salt(), pwd);
 

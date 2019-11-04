@@ -5,6 +5,9 @@ use crate::engine::password_engine::hash_password;
 use crate::engine::uuid_engine::generate_id;
 
 // TODO: Have a basic presenter
+/**
+ * Internal account structure
+ */
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
     #[serde(default = "generate_id")]
@@ -14,8 +17,10 @@ pub struct Model {
     pub password: String
 }
 
-// TODO! Turn request into async
 impl Model {
+    /**
+     * Get an account by id
+     */
     pub fn get_by_id(conn: Pool, id: &str) -> Vec<Model> {
         let mut accounts: Vec<Model> = Vec::with_capacity(1);
 
@@ -30,6 +35,9 @@ impl Model {
         return accounts
     }
 
+    /**
+     * Get all account from the database (default limit is 100)
+     */
     pub fn get_all(conn: Pool) -> Vec<Model> {
         let mut accounts: Vec<Model> = Vec::with_capacity(100);
 
@@ -44,16 +52,26 @@ impl Model {
         return accounts
     }
 
+    /**
+     * Insert an new account in the database
+     * Password is secured at this point
+     */
     pub fn insert(&mut self, conn: Pool) {
         self.password = hash_password(&self.password);
 
         conn.execute("INSERT INTO account (id, name, email, password) VALUES ($1, $2, $3, $4)", &[&self.id, &self.name, &self.email, &self.password]).unwrap();
     }
 
+    /**
+     * Update an account detail
+     */
     pub fn patch(&self, conn: Pool) {
-        conn.execute("UPDATE account SET name=$1, email=$2, password=$3 WHERE id=$4", &[&self.name, &self.email, &self.password, &self.id]).unwrap();
+        conn.execute("UPDATE account SET name=$1, email=$2 WHERE id=$4", &[&self.name, &self.email, &self.id]).unwrap();
     }
 
+    /**
+     * Delete an account
+     */
     pub fn delete(&self, conn: Pool) {
         conn.execute("DELETE FROM account WHERE id=$1", &[&self.id]).unwrap();
     }

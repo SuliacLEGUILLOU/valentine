@@ -1,3 +1,11 @@
+## How to use this framework
+
+### Environment variable
+
+- ADDR: Local address to use
+- PORT: Local port
+- DB_URI: PostgreSQL database uri for connection
+- SECRET_SALT(optional): External salt for platform password protection
 
 ## Directory architecture
 
@@ -21,8 +29,8 @@ Each resource folder are build around the following files:
 
 - Unit test
 - Mail engine
-- Improve log
 - Websocket
+- Log level and main thread logger
 
 ### Until decent system
 
@@ -32,3 +40,11 @@ Each resource folder are build around the following files:
 - Setup multi threading
 - Rate limit
 - oauth support
+- Integration testing
+- Basic Vue.js SPA frontend
+- Some documentations
+
+### Bonus/Potential features
+
+- Make an example of template use
+- Have the front be a Rust WebAssembly app
