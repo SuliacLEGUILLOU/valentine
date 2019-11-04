@@ -47,7 +47,7 @@ fn get<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> 
 
 fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
-    let account = try_with!(res, {
+    let mut account = try_with!(res, {
         req.json_as::<Account>().map_err(|e| (StatusCode::BadRequest, e))
     });
 

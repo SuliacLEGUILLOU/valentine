@@ -7,7 +7,7 @@ use crate::engine::uuid_engine::generate_id;
 // TODO: Have a basic presenter
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
-    #[serde(default = "generate_id")]   // TODO Move that to a more generic place
+    #[serde(default = "generate_id")]
     pub id: String,
     pub name: String,
     pub email: String,
@@ -44,10 +44,10 @@ impl Model {
         return accounts
     }
 
-    pub fn insert(&self, conn: Pool) {
-        let hash = hash_password(&self.password).unwrap();
+    pub fn insert(&mut self, conn: Pool) {
+        self.password = hash_password(&self.password);
 
-        conn.execute("INSERT INTO account (id, name, email, password) VALUES ($1, $2, $3, $4)", &[&self.id, &self.name, &self.email, &hash]).unwrap();
+        conn.execute("INSERT INTO account (id, name, email, password) VALUES ($1, $2, $3, $4)", &[&self.id, &self.name, &self.email, &self.password]).unwrap();
     }
 
     pub fn patch(&self, conn: Pool) {
