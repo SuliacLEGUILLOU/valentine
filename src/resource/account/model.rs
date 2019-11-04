@@ -1,9 +1,8 @@
 use r2d2_postgres::PostgresConnectionManager;
 type Pool = r2d2::PooledConnection<PostgresConnectionManager>;
 
-use uuid::Uuid;
-
 use crate::engine::password_engine::hash_password;
+use crate::engine::uuid_engine::generate_id;
 
 // TODO: Have a basic presenter
 #[derive(Debug, Serialize, Deserialize)]
@@ -13,10 +12,6 @@ pub struct Model {
     pub name: String,
     pub email: String,
     pub password: String
-}
-
-fn generate_id() -> String {
-    Uuid::new_v4().to_string()
 }
 
 // TODO! Turn request into async

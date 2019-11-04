@@ -11,18 +11,21 @@ Each resource folder are build around the following files:
 
 ## Todo
 
-### Until usable system
+### Until V0.1
 
 - Session engine (JWT) and authorization
-- Unit test
+- Some response_engine in charge of formatting the result of the request (Require a good dig at the middleware)
 - Proper async db query
+
+### Until usable system
+
+- Unit test
 - Mail engine
 - Improve log
 - Websocket
 
 ### Until decent system
 
-- Some response_engine in charge of formatting the result of the request (Require a good dig at the middleware)
 - CI/CD
 - Validator
 - Systemd service
