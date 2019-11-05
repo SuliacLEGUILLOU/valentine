@@ -45,6 +45,7 @@ Each resource folder are build around the following files:
 - Integration testing
 - Basic Vue.js SPA frontend
 - Some documentations
+- Customize error output to make it RESTFull
 
 ### Bonus/Potential features
 

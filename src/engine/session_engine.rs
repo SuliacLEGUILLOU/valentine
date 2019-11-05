@@ -10,24 +10,34 @@ use typemap::Key;
 
 use crate::resource::account::model::Model as Account;
 
+/**
+ * Response structure for the post /session endpoint
+ */
 #[derive(Serialize, Deserialize, Debug)]
 struct ResBody {
     code: String,
     token: String
 }
 
+/**
+ * Body structure for the post /session endpoint
+ */
 #[derive(Serialize, Deserialize, Debug)]
 struct ReqBody {
     email: String,
     password: String
 }
 
+/**
+ * Session structure
+ * This is inserted into the Request structure.
+ */
 // Allow to store userId in the session's map
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Session { pub id: String }
 impl Key for Session { type Value = Session; }
 
-// TODO Find a way to make that stuff more clean (Need to see how to have multiple mw invoke on struct)
+// TODO Find a way to make those one structure (Need to see how to have multiple mw invoke on struct)
 struct SessionManager { secret: String }
 struct SessionCreation { secret: String }
 
@@ -38,13 +48,12 @@ struct SessionCreation { secret: String }
 impl<D> Middleware<D> for SessionManager {
     fn invoke<'mw, 'conn>(&self, req: &mut Request<'mw, 'conn, D>, res: Response<'mw, D>)
     -> MiddlewareResult<'mw, D> {
-        println!("logging request from logger middleware: {:?}", self.secret);
-
         let auth_header = match req.origin.headers.get::<Authorization<Bearer>>() {
             Some(header) => header,
             None => return res.next_middleware()
         };
 
+        // TODO: Quick search could not get me the no-deprecated version
         let jwt = header::HeaderFormatter(auth_header).to_string();
         let jwt_slice = &jwt[7..];
         let token = Token::<Header, Registered>::parse(jwt_slice).unwrap();
