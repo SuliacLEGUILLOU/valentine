@@ -9,6 +9,8 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate bcrypt;
 extern crate rand;
+extern crate plugin;
+extern crate typemap;
 
 use nickel::{Nickel, Mountable, StaticFilesHandler};
 use nickel_postgres::PostgresMiddleware;
@@ -22,6 +24,7 @@ use resource::account::controller as account_controller;
 
 pub mod engine;
 use engine::log_engine;
+use engine::response_engine;
 
 fn main() {
     let mut server = Nickel::new();
@@ -50,5 +53,6 @@ fn main() {
     account_controller::add_route(&mut router);
     server.utilize(router);
 
+    response_engine::attache(&mut server);
     server.listen(format!("{}:{}", addr, port)).unwrap();
 }

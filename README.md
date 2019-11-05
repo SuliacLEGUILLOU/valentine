@@ -22,7 +22,6 @@ Each resource folder are build around the following files:
 ### Until V0.1
 
 - Session engine (JWT) and authorization
-- Some response_engine in charge of formatting the result of the request (Require a good dig at the middleware)
 - Proper async db query
 
 ### Until usable system
@@ -31,6 +30,7 @@ Each resource folder are build around the following files:
 - Mail engine
 - Websocket
 - Log level and main thread logger
+- Improve the response engine format to make it more generic
 
 ### Until decent system
 
@@ -48,3 +48,4 @@ Each resource folder are build around the following files:
 
 - Make an example of template use
 - Have the front be a Rust WebAssembly app
+- Multiple output support

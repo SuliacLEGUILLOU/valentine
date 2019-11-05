@@ -1,5 +1,9 @@
-use nickel::{HttpRouter, Request, Response, MiddlewareResult, JsonBody, MediaType};
+use nickel::{HttpRouter, Request, Response, MiddlewareResult, JsonBody};
 use nickel::status::StatusCode;
+
+use crate::plugin::Extensible;
+use typemap::Key;
+
 use nickel_postgres::PostgresRequestExtensions;
 
 use super::model::Model as Account;
@@ -13,7 +17,7 @@ pub fn add_route(router: &mut nickel::Router) {
 }
 
 #[derive(Serialize, Deserialize)]
-struct RawResponse {
+pub struct RawResponse {
     status: String,
     account: Vec<Account>,
 }
@@ -25,24 +29,23 @@ fn get_all<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'
         account: Account::get_all(conn)
     };
 
-    res.set(MediaType::Json);
-    res.send(serde_json::to_string(&body).unwrap())
+    res.extensions_mut().insert::<RawResponse>(body);
+    res.next_middleware()
 }
+
+impl Key for RawResponse { type Value = RawResponse; }
 
 fn get<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
     let id = req.param("id").unwrap();
-    
-    let mut body = RawResponse {
+
+    let body = RawResponse {
         status: String::from("OK"),
         account: Account::get_by_id(conn, id)
     };
 
-    if body.account.len() == 0 {
-        body.status = String::from("NOT_FOUND");
-    }
-    res.set(MediaType::Json);
-    res.send(serde_json::to_string(&body).unwrap())
+    res.extensions_mut().insert::<RawResponse>(body);
+    res.next_middleware()
 }
 
 fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
@@ -57,8 +60,8 @@ fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw>
         status: String::from("CREATED"),
         account: vec![account]
     };
-    res.set(MediaType::Json);
-    res.send(serde_json::to_string(&body).unwrap())
+    res.extensions_mut().insert::<RawResponse>(body);
+    res.next_middleware()
 }
 
 fn patch<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
@@ -74,8 +77,8 @@ fn patch<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw
         status: String::from("ACCEPTED"),
         account: vec![account]
     };
-    res.set(MediaType::Json);
-    res.send(serde_json::to_string(&body).unwrap())
+    res.extensions_mut().insert::<RawResponse>(body);
+    res.next_middleware()
 }
 
 fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
@@ -93,6 +96,6 @@ fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'m
         status: String::from("ACCEPTED"),
         account: vec![account]
     };
-    res.set(MediaType::Json);
-    res.send(serde_json::to_string(&body).unwrap())
+    res.extensions_mut().insert::<RawResponse>(body);
+    res.next_middleware()
 }
