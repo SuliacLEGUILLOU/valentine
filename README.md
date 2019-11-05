@@ -5,6 +5,7 @@
 - ADDR: Local address to use
 - PORT: Local port
 - DB_URI: PostgreSQL database uri for connection
+- SESSION_SECRET: Secret used to generate JWT sessions
 - SECRET_SALT(optional): External salt for platform password protection
 
 ## Directory architecture
