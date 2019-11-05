@@ -25,6 +25,7 @@ use resource::account::controller as account_controller;
 pub mod engine;
 use engine::log_engine;
 use engine::response_engine;
+use engine::session_engine;
 
 fn main() {
     let mut server = Nickel::new();
@@ -33,11 +34,15 @@ fn main() {
     let addr = env::var("ADDR").unwrap();
     let port = env::var("PORT").unwrap();
     let db_uri = env::var("DB_URI").unwrap();
+    let session_secret = env::var("SESSION_SECRET").unwrap();
 
     // Serve front end
-    // TODO: Disable this for CDN settings
+    // TODO: Disable this for CDN settings?
     server.mount("/app/", StaticFilesHandler::new("front/app/")
     );
+
+    // Add the session check to the middleware stack
+    session_engine::attach(&mut server, &session_secret);
 
     // Initialize database
     let db_mgr = PostgresConnectionManager::new(db_uri.as_ref(), TlsMode::None) // TODO: Investigate TlsMode
@@ -50,6 +55,7 @@ fn main() {
     log_engine::attache(&mut server);
 
     // Init controllers
+    session_engine::register_session_route(&mut router, &session_secret);
     account_controller::add_route(&mut router);
     server.utilize(router);
 

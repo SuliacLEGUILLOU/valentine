@@ -1,7 +1,7 @@
 use r2d2_postgres::PostgresConnectionManager;
 type Pool = r2d2::PooledConnection<PostgresConnectionManager>;
 
-use crate::engine::password_engine::hash_password;
+use crate::engine::password_engine::{hash_password, check_password};
 use crate::engine::uuid_engine::generate_id;
 
 // TODO: Have a basic presenter
@@ -36,6 +36,30 @@ impl Model {
     }
 
     /**
+     * Get an account by it's email and password for login purpose
+     */
+    pub fn get_for_login(conn: Pool, email: String, password: String) -> Model {
+        let mut accounts: Vec<Model> = Vec::with_capacity(1);
+
+        for row in &conn.query("SELECT id, name, email, password FROM account WHERE email=$1", &[&email]).unwrap() {
+            accounts.push(Model {
+                id: row.get(0),
+                name: row.get(1),
+                email: row.get(2),
+                password: row.get(3),
+            })
+        }
+        if accounts.len() != 1 {
+            panic!("Catch this and throw 403");
+        }
+        let account = accounts.pop().unwrap();
+        if !check_password(&password.to_string(), &account.password) {
+            panic!("Catch this and throw 403");
+        }
+        return account
+    }
+
+    /**
      * Get all account from the database (default limit is 100)
      */
     pub fn get_all(conn: Pool) -> Vec<Model> {
@@ -66,7 +90,7 @@ impl Model {
      * Update an account detail
      */
     pub fn patch(&self, conn: Pool) {
-        conn.execute("UPDATE account SET name=$1, email=$2 WHERE id=$4", &[&self.name, &self.email, &self.id]).unwrap();
+        conn.execute("UPDATE account SET name=$1, email=$2 WHERE id=$3", &[&self.name, &self.email, &self.id]).unwrap();
     }
 
     /**

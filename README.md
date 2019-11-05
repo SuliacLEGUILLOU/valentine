@@ -21,7 +21,6 @@ Each resource folder are build around the following files:
 
 ### Until V0.1
 
-- Session engine (JWT) and authorization
 - Proper async db query
 
 ### Until usable system
@@ -31,6 +30,9 @@ Each resource folder are build around the following files:
 - Websocket
 - Log level and main thread logger
 - Improve the response engine format to make it more generic
+- Session engine improvement (Session update, deletion and expiry)
+- Presenter system for resource
+- Authorization engine
 
 ### Until decent system
 

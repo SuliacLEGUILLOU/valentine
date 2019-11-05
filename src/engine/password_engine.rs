@@ -24,7 +24,7 @@ pub fn hash_password(pwd: &String) -> String {
 /**
  * Verify the provided password
  */
-pub fn check_password(pwd: &String, hashed: String) -> bool {
+pub fn check_password(pwd: &String, hashed: &String) -> bool {
     let message = format!("{}{}", generate_system_salt(), pwd);
 
     verify(message, &hashed).unwrap()
@@ -47,8 +47,7 @@ mod tests {
         let pwd = "123456".to_string();
         let hashed = hash_password(&pwd);
 
-        let pwd = "123456".to_string();
-        let result = check_password(&pwd, hashed);
+        let result = check_password(&pwd, &hashed);
         assert!(result);
         // println!("{:?}", check_password(pwd, hashed));
     }

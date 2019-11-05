@@ -8,6 +8,8 @@ use nickel_postgres::PostgresRequestExtensions;
 
 use super::model::Model as Account;
 
+use crate::engine::session_engine::Session;
+
 pub fn add_route(router: &mut nickel::Router) {
     router.get("/account", get_all);
     router.get("/account/:id", get);
@@ -21,6 +23,7 @@ pub struct RawResponse {
     status: String,
     account: Vec<Account>,
 }
+impl Key for RawResponse { type Value = RawResponse; }
 
 fn get_all<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
@@ -32,8 +35,6 @@ fn get_all<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'
     res.extensions_mut().insert::<RawResponse>(body);
     res.next_middleware()
 }
-
-impl Key for RawResponse { type Value = RawResponse; }
 
 fn get<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
@@ -71,6 +72,10 @@ fn patch<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw
     });
 
     account.id = req.param("id").unwrap().to_string();
+    let session = req.extensions().get::<Session>().unwrap();
+
+    if session.id != account.id { return res.error(StatusCode::Forbidden, "Access denied") }
+
     account.patch(conn);
 
     let body = RawResponse {
@@ -89,6 +94,9 @@ fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'m
         email: "".to_string(),
         password: "".to_string(),
     };
+
+    let session = req.extensions().get::<Session>().unwrap();
+    if session.id != account.id { return res.error(StatusCode::Forbidden, "Access denied") }
 
     account.delete(conn);
 
