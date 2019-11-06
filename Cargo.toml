@@ -20,6 +20,7 @@ plugin = "0.2.6"
 typemap = "0.3.3"
 jwt = "*"
 rust-crypto = "*"
+chrono = "0.4"
 
 [dependencies.nickel_postgres]
 git = "https://github.com/nickel-org/nickel-postgres.git"

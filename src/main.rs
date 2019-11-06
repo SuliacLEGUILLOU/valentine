@@ -11,6 +11,7 @@ extern crate bcrypt;
 extern crate rand;
 extern crate plugin;
 extern crate typemap;
+extern crate chrono;
 
 use nickel::{Nickel, Mountable, StaticFilesHandler};
 use nickel_postgres::PostgresMiddleware;
