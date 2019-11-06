@@ -2,13 +2,13 @@ use nickel::{HttpRouter, Request, Response, MiddlewareResult, JsonBody};
 use nickel::status::StatusCode;
 
 use crate::plugin::Extensible;
-use typemap::Key;
 
 use nickel_postgres::PostgresRequestExtensions;
 
 use super::model::Model as Account;
 
 use crate::engine::session_engine::Session;
+use crate::engine::response_engine::BodyResponse;
 
 pub fn add_route(router: &mut nickel::Router) {
     router.get("/account", get_all);
@@ -18,76 +18,56 @@ pub fn add_route(router: &mut nickel::Router) {
     router.delete("/account/:id", delete);
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct RawResponse {
-    status: String,
-    account: Vec<Account>,
-}
-impl Key for RawResponse { type Value = RawResponse; }
-
 fn get_all<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
-    let body = RawResponse {
-        status: String::from("OK"),
-        account: Account::get_all(conn)
-    };
+    let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
 
-    res.extensions_mut().insert::<RawResponse>(body);
+    body.account.append(&mut Account::get_all(conn));
     res.next_middleware()
 }
 
 fn get<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
+    let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
     let id = req.param("id").unwrap();
 
-    let body = RawResponse {
-        status: String::from("OK"),
-        account: Account::get_by_id(conn, id)
-    };
-
-    res.extensions_mut().insert::<RawResponse>(body);
+    body.account.append(&mut Account::get_by_id(conn, id));
     res.next_middleware()
 }
 
 fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
+    let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
     let mut account = try_with!(res, {
         req.json_as::<Account>().map_err(|e| (StatusCode::BadRequest, e))
     });
 
     account.insert(conn);
-
-    let body = RawResponse {
-        status: String::from("CREATED"),
-        account: vec![account]
-    };
-    res.extensions_mut().insert::<RawResponse>(body);
+    body.account.push(account);
     res.next_middleware()
 }
 
 fn patch<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
+    let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
     let mut account = try_with!(res, {
         req.json_as::<Account>().map_err(|e| (StatusCode::BadRequest, e))
     });
+    let session = req.extensions().get::<Session>().unwrap();
 
     account.id = req.param("id").unwrap().to_string();
-    let session = req.extensions().get::<Session>().unwrap();
 
     if session.id != account.id { return res.error(StatusCode::Forbidden, "Access denied") }
 
     account.patch(conn);
-
-    let body = RawResponse {
-        status: String::from("ACCEPTED"),
-        account: vec![account]
-    };
-    res.extensions_mut().insert::<RawResponse>(body);
+    body.account.push(account);
     res.next_middleware()
 }
 
 fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     let conn = try_with!(res, req.pg_conn());
+    let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
+    let session = req.extensions().get::<Session>().unwrap();
     let account = Account {
         id: req.param("id").unwrap().to_string(),
         name: "".to_string(),
@@ -95,15 +75,9 @@ fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'m
         password: "".to_string(),
     };
 
-    let session = req.extensions().get::<Session>().unwrap();
     if session.id != account.id { return res.error(StatusCode::Forbidden, "Access denied") }
 
     account.delete(conn);
-
-    let body = RawResponse {
-        status: String::from("ACCEPTED"),
-        account: vec![account]
-    };
-    res.extensions_mut().insert::<RawResponse>(body);
+    body.account.push(account);
     res.next_middleware()
 }

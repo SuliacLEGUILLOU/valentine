@@ -15,8 +15,11 @@ Thing are gathered in the resource folder under their name.
 Each resource folder are build around the following files:
 
 - controller: Manage the routing and the basic control of the resource
-- model: Contain the database and api internal structure of the resource
-- presenter: Contain the api external structure of the resource
+- model: Contain the database and api internal structure of the resource.
+
+### Presenter
+
+Presentation is manage inside the model structure with the help of the [Serde crate](https://serde.rs/)
 
 ## Todo
 
@@ -48,6 +51,10 @@ Each resource folder are build around the following files:
 - Some documentations
 - Customize error output to make it RESTFull
 - Complete implementation for the JWT security (Key rotation, secondary token)
+
+### Current question
+
+- Is it possible in Nickel to register a middleware at the top/bottom position in the stack
 
 ### Bonus/Potential features
 

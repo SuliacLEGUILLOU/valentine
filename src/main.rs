@@ -38,11 +38,14 @@ fn main() {
 
     // Serve front end
     // TODO: Disable this for CDN settings?
-    server.mount("/app/", StaticFilesHandler::new("front/app/")
-    );
+    server.mount("/app/", StaticFilesHandler::new("front/app/"));
 
     // Add the session check to the middleware stack
     session_engine::attach(&mut server, &session_secret);
+
+    // Attach the initialization of the response engine
+    // TODO: Find a way to groupe the two response engine call in the main (one MW as to run first, the other one last)
+    response_engine::attache_init(&mut server);
 
     // Initialize database
     let db_mgr = PostgresConnectionManager::new(db_uri.as_ref(), TlsMode::None) // TODO: Investigate TlsMode
@@ -59,6 +62,6 @@ fn main() {
     account_controller::add_route(&mut router);
     server.utilize(router);
 
-    response_engine::attache(&mut server);
+    response_engine::attache_final(&mut server);
     server.listen(format!("{}:{}", addr, port)).unwrap();
 }

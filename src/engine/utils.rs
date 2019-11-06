@@ -9,6 +9,10 @@ pub fn generate_id() -> String {
     Uuid::new_v4().to_string()
 }
 
+pub fn test_empty_vec<T>(v: &Vec<T>) -> bool {
+    v.len() == 0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
