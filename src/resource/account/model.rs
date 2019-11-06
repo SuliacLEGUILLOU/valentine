@@ -2,7 +2,7 @@ use r2d2_postgres::PostgresConnectionManager;
 type Pool = r2d2::PooledConnection<PostgresConnectionManager>;
 
 use crate::engine::password_engine::{hash_password, check_password};
-use crate::engine::uuid_engine::generate_id;
+use crate::engine::uuid_engine::*;
 
 // TODO: Have a basic presenter
 /**
@@ -14,6 +14,7 @@ pub struct Model {
     pub id: String,
     pub name: String,
     pub email: String,
+    #[serde(skip_serializing)]
     pub password: String
 }
 

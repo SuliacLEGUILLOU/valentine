@@ -47,6 +47,7 @@ Each resource folder are build around the following files:
 - Basic Vue.js SPA frontend
 - Some documentations
 - Customize error output to make it RESTFull
+- Complete implementation for the JWT security (Key rotation, secondary token)
 
 ### Bonus/Potential features
 
