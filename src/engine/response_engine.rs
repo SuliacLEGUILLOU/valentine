@@ -31,7 +31,7 @@ fn init_request<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareRe
     res.next_middleware()
 }
 
-// Attache the response middleware to the server
+// Attache the response init middleware to the server
 pub fn attache_init(server: &mut nickel::Nickel) {
     server.utilize(init_request);
 }
@@ -50,8 +50,6 @@ fn get_json(res: &Response) -> String {
 /**
  * Finalize the request by putting it into the JSON format
  * TODO: This can easily be expanded to support more output format based on req header
- * TODO: Make this more generic so it's easier to use
- * TODO: The code of the response body should be dealt with in the engine and not at controller level
  */
 fn finalize_request<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     res.set(MediaType::Json);
@@ -60,7 +58,7 @@ fn finalize_request<'mw>(_req: &mut Request, mut res: Response<'mw>) -> Middlewa
     res.send(body)
 }
 
-// Attache the response middleware to the server
+// Attache the response final middleware to the server
 pub fn attache_final(server: &mut nickel::Nickel) {
     server.utilize(finalize_request);
 }

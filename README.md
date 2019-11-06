@@ -33,15 +33,13 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Mail engine
 - Websocket
 - Log level and main thread logger
-- Improve the response engine format to make it more generic
 - Session engine improvement (Session update, deletion and expiry)
-- Presenter system for resource
 - Authorization engine
 
 ### Until decent system
 
 - CI/CD
-- Validator
+- Validator (Could use serde strict mode?)
 - Systemd service
 - Setup multi threading
 - Rate limit
@@ -51,6 +49,7 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Some documentations
 - Customize error output to make it RESTFull
 - Complete implementation for the JWT security (Key rotation, secondary token)
+- Output format based on request
 
 ### Current question
 
@@ -60,4 +59,3 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 
 - Make an example of template use
 - Have the front be a Rust WebAssembly app
-- Multiple output support

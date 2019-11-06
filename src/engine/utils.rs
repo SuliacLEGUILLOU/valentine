@@ -21,4 +21,12 @@ mod tests {
     fn test_generate_id() {
         assert_eq!(generate_id().len(), 36);
     }
+
+    #[test]
+    fn test_test_empty_vec() {
+        assert_eq!(test_empty_vec::<u32>(&vec![]), true);
+        assert_eq!(test_empty_vec::<u32>(&vec![10, 5]), false);
+        assert_eq!(test_empty_vec::<String>(&vec![]), true);
+        assert_eq!(test_empty_vec::<String>(&vec![String::from("1234")]), false);
+    }
 }

@@ -4,7 +4,6 @@ type Pool = r2d2::PooledConnection<PostgresConnectionManager>;
 use crate::engine::password_engine::{hash_password, check_password};
 use crate::engine::utils::*;
 
-// TODO: Have a basic presenter
 /**
  * Internal account structure
  */
