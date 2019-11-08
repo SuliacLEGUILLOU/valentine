@@ -1,5 +1,5 @@
-use nickel::{HttpRouter, Request, Response, MiddlewareResult, JsonBody};
 use nickel::status::StatusCode;
+use nickel::{HttpRouter, JsonBody, MiddlewareResult, Request, Response};
 
 use crate::plugin::Extensible;
 
@@ -7,8 +7,8 @@ use nickel_postgres::PostgresRequestExtensions;
 
 use super::model::Model as Account;
 
-use crate::engine::session_engine::Session;
 use crate::engine::response_engine::BodyResponse;
+use crate::engine::session_engine::Session;
 
 pub fn add_route(router: &mut nickel::Router) {
     router.get("/account", get_all);
@@ -39,7 +39,8 @@ fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw>
     let conn = try_with!(res, req.pg_conn());
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
     let mut account = try_with!(res, {
-        req.json_as::<Account>().map_err(|e| (StatusCode::BadRequest, e))
+        req.json_as::<Account>()
+            .map_err(|e| (StatusCode::BadRequest, e))
     });
 
     account.insert(conn);
@@ -51,13 +52,16 @@ fn patch<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw
     let conn = try_with!(res, req.pg_conn());
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
     let mut account = try_with!(res, {
-        req.json_as::<Account>().map_err(|e| (StatusCode::BadRequest, e))
+        req.json_as::<Account>()
+            .map_err(|e| (StatusCode::BadRequest, e))
     });
     let session = req.extensions().get::<Session>().unwrap();
 
     account.id = req.param("id").unwrap().to_string();
 
-    if session.id != account.id { return res.error(StatusCode::Forbidden, "Access denied") }
+    if session.id != account.id {
+        return res.error(StatusCode::Forbidden, "Access denied");
+    }
 
     account.patch(conn);
     body.account.push(account);
@@ -75,7 +79,9 @@ fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'m
         password: "".to_string(),
     };
 
-    if session.id != account.id { return res.error(StatusCode::Forbidden, "Access denied") }
+    if session.id != account.id {
+        return res.error(StatusCode::Forbidden, "Access denied");
+    }
 
     account.delete(conn);
     body.account.push(account);

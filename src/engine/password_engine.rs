@@ -1,5 +1,5 @@
+use bcrypt::{hash, verify, DEFAULT_COST};
 use std::env;
-use bcrypt::{DEFAULT_COST, hash, verify};
 
 /**
  * Get the optional system salt from the SECRET_SALT variable
@@ -8,7 +8,7 @@ use bcrypt::{DEFAULT_COST, hash, verify};
 fn generate_system_salt() -> String {
     match env::var("SECRET_SALT") {
         Ok(h) => h,
-        Err(_) => "".to_string()
+        Err(_) => "".to_string(),
     }
 }
 

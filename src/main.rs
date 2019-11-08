@@ -8,12 +8,12 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 extern crate bcrypt;
-extern crate rand;
-extern crate plugin;
-extern crate typemap;
 extern crate chrono;
+extern crate plugin;
+extern crate rand;
+extern crate typemap;
 
-use nickel::{Nickel, Mountable, StaticFilesHandler};
+use nickel::{Mountable, Nickel, StaticFilesHandler};
 use nickel_postgres::PostgresMiddleware;
 use r2d2::Pool;
 use r2d2_postgres::{PostgresConnectionManager, TlsMode};
@@ -51,8 +51,7 @@ fn main() {
     // Initialize database
     let db_mgr = PostgresConnectionManager::new(db_uri.as_ref(), TlsMode::None) // TODO: Investigate TlsMode
         .expect("Unable to connect to database");
-    let db_pool = Pool::new(db_mgr)
-        .expect("Unable to initialize connection pool");
+    let db_pool = Pool::new(db_mgr).expect("Unable to initialize connection pool");
     server.utilize(PostgresMiddleware::with_pool(db_pool));
 
     // Init Logger
