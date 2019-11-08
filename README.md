@@ -33,8 +33,9 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Mail engine
 - Websocket
 - Log level and main thread logger
-- Session engine improvement (Session update, deletion and expiry)
+- Session engine improvement (Session renew, update, deletion and expiry)
 - Authorization engine
+- Customize error output to make it RESTFull
 
 ### Until decent system
 
@@ -47,12 +48,13 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Integration testing
 - Basic Vue.js SPA frontend
 - Some documentations
-- Customize error output to make it RESTFull
 - Complete implementation for the JWT security (Key rotation, secondary token)
-- Output format based on request
+- Output format based on request Accept header
+- GZIP response
 
 ### Current question
 
+- Does the log writing have to be sync once I use multi-threading
 - Is it possible in Nickel to register a middleware at the top/bottom position in the stack
 
 ### Bonus/Potential features
