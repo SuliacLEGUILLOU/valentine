@@ -34,7 +34,6 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Websocket
 - Log level and main thread logger
 - Session engine improvement (Session renew, update, deletion and expiry)
-- Authorization engine
 - Customize error output to make it RESTFull
 
 ### Until decent system

@@ -2,13 +2,14 @@ use crypto::sha2::Sha512;
 use jwt::{Header, Registered, Token};
 use nickel::hyper::header::{self, Authorization, Bearer};
 use nickel::status::StatusCode;
-use nickel::{HttpRouter, JsonBody, MediaType, Middleware, MiddlewareResult, Request, Response};
+use nickel::{Nickel, HttpRouter, JsonBody, MediaType, Middleware, MiddlewareResult, Request, Response};
 use nickel_postgres::PostgresRequestExtensions;
 
 use crate::plugin::Extensible;
 use typemap::Key;
 
 use crate::resource::account::model::Model as Account;
+use super::config_engine::Config;
 
 /**
  * Response structure for the post /session endpoint
@@ -115,14 +116,14 @@ impl<D> Middleware<D> for SessionCreation {
 }
 
 // Attach the session check middleware to a server
-pub fn attach(server: &mut nickel::Nickel, session_secret: &String) {
+pub fn attach(server: &mut Nickel<Config>, session_secret: &String) {
     server.utilize(SessionManager {
         secret: session_secret.clone(),
     });
 }
 
 // Register route for the session management route
-pub fn register_session_route(router: &mut nickel::Router, session_secret: &String) {
+pub fn register_session_route(router: &mut nickel::Router<Config>, session_secret: &String) {
     router.post(
         "/session",
         SessionCreation {
