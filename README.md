@@ -59,3 +59,7 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 
 - Make an example of template use
 - Have the front be a Rust WebAssembly app
+
+## External documentation
+
+[Testing JWT security](https://github.com/ticarpi/jwt_tool/wiki)

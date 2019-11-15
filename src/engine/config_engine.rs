@@ -2,6 +2,10 @@ use super::authorization_engine::AuthorizationEngine;
 
 use crate::resource::account::rule_set::set_rules as set_account_rules;
 
+/**
+ * The config struct is used to hold the server configuration (See first line of the main)
+ * It is loading every engine needed by the application so they can be used by controller 
+ */
 pub struct Config {
     pub authorization_engine: AuthorizationEngine
 }
