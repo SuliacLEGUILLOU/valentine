@@ -57,7 +57,10 @@ fn patch<'mw>(req: &mut Request<Config>, mut res: Response<'mw, Config>) -> Midd
         req.json_as::<Account>()
             .map_err(|e| (StatusCode::BadRequest, e))
     });
-    let session = req.extensions().get::<Session>().unwrap();
+    let session = match req.extensions().get::<Session>() {
+        Some(s) => s,
+        None => return res.error(StatusCode::Forbidden, "Forbidden")
+    };
     let config = req.server_data();
 
     if config.authorization_engine.check_rule("IS_ACCOUNT", req) == false {

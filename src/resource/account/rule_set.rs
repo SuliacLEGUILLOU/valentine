@@ -19,7 +19,10 @@ pub fn set_rules(engine: &mut AuthorizationEngine){
  * If no account_id is provided, try with the id field
  */
 fn is_account(req: &Request<Config>) -> bool {
-    let session = req.extensions().get::<Session>().unwrap();
+    let session = match req.extensions().get::<Session>() {
+        Some(s) => s,
+        None => return false
+    };
     
     match req.param("account_id") {
         Some(id) => return id.to_string() == session.id,
@@ -36,8 +39,11 @@ fn is_account(req: &Request<Config>) -> bool {
  * Return true if the session user id is matching the param user_id
  */
 fn is_account_strict(req: &Request<Config>) -> bool {
-    let session = req.extensions().get::<Session>().unwrap();
-    
+    let session = match req.extensions().get::<Session>() {
+        Some(s) => s,
+        None => return false
+    };
+
     match req.param("account_id") {
         Some(id) => id.to_string() == session.id,
         None => false

@@ -50,6 +50,7 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Some documentations
 - Complete implementation for the JWT security (Key rotation, secondary token)
 - Output format based on request Accept header
+- Create macro helper to load session and database connection
 
 ### Current question
 
