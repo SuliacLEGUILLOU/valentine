@@ -15,7 +15,8 @@ Thing are gathered in the resource folder under their name.
 Each resource folder are build around the following files:
 
 - controller: Manage the routing and the basic control of the resource
-- model: Contain the database and api internal structure of the resource.
+- model: Contain the database and api internal structure of the resource
+- rule_set: Define all the rules linked to this resource to the authorization_engine. Rules can be used in the entire project
 
 ### Presenter
 
