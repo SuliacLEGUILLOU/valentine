@@ -10,7 +10,9 @@ use super::model::Model as Account;
 use crate::engine::response_engine::BodyResponse;
 use crate::engine::session_engine::Session;
 
-pub fn add_route(router: &mut nickel::Router) {
+use crate::engine::config_engine::Config;
+
+pub fn add_route(router: &mut nickel::Router<Config>) {
     router.get("/account", get_all);
     router.get("/account/:id", get);
     router.post("/account", post);
@@ -18,26 +20,26 @@ pub fn add_route(router: &mut nickel::Router) {
     router.delete("/account/:id", delete);
 }
 
-fn get_all<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
-    let conn = try_with!(res, req.pg_conn());
+fn get_all<'mw>(req: &mut Request<Config>, mut res: Response<'mw, Config>) -> MiddlewareResult<'mw, Config> {
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
+    let conn = try_with!(res, req.pg_conn());
 
     body.account.append(&mut Account::get_all(conn));
     res.next_middleware()
 }
 
-fn get<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
-    let conn = try_with!(res, req.pg_conn());
+fn get<'mw>(req: &mut Request<Config>, mut res: Response<'mw, Config>) -> MiddlewareResult<'mw, Config> {
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
+    let conn = try_with!(res, req.pg_conn());
     let id = req.param("id").unwrap();
 
     body.account.append(&mut Account::get_by_id(conn, id));
     res.next_middleware()
 }
 
-fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
-    let conn = try_with!(res, req.pg_conn());
+fn post<'mw>(req: &mut Request<Config>, mut res: Response<'mw, Config>) -> MiddlewareResult<'mw, Config> {
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
+    let conn = try_with!(res, req.pg_conn());
     let mut account = try_with!(res, {
         req.json_as::<Account>()
             .map_err(|e| (StatusCode::BadRequest, e))
@@ -48,30 +50,33 @@ fn post<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw>
     res.next_middleware()
 }
 
-fn patch<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
-    let conn = try_with!(res, req.pg_conn());
+fn patch<'mw>(req: &mut Request<Config>, mut res: Response<'mw, Config>) -> MiddlewareResult<'mw, Config> {
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
+    let conn = try_with!(res, req.pg_conn());
     let mut account = try_with!(res, {
         req.json_as::<Account>()
             .map_err(|e| (StatusCode::BadRequest, e))
     });
-    let session = req.extensions().get::<Session>().unwrap();
+    let session = match req.extensions().get::<Session>() {
+        Some(s) => s,
+        None => return res.error(StatusCode::Forbidden, "Forbidden")
+    };
+    let config = req.server_data();
 
-    account.id = req.param("id").unwrap().to_string();
-
-    if session.id != account.id {
-        return res.error(StatusCode::Forbidden, "Access denied");
+    if config.authorization_engine.check_rule("IS_ACCOUNT", req) == false {
+        return res.error(StatusCode::Forbidden, "Wrong user");
     }
 
+    account.id = session.id.clone();
     account.patch(conn);
     body.account.push(account);
     res.next_middleware()
 }
 
-fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
-    let conn = try_with!(res, req.pg_conn());
+fn delete<'mw>(req: &mut Request<Config>, mut res: Response<'mw, Config>) -> MiddlewareResult<'mw, Config> {
     let body = res.extensions_mut().get_mut::<BodyResponse>().unwrap();
-    let session = req.extensions().get::<Session>().unwrap();
+    let config = req.server_data();
+    let conn = try_with!(res, req.pg_conn());
     let account = Account {
         id: req.param("id").unwrap().to_string(),
         name: "".to_string(),
@@ -79,8 +84,8 @@ fn delete<'mw>(req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'m
         password: "".to_string(),
     };
 
-    if session.id != account.id {
-        return res.error(StatusCode::Forbidden, "Access denied");
+    if config.authorization_engine.check_rule("IS_ACCOUNT", req) == false {
+        return res.error(StatusCode::Forbidden, "Wrong user");
     }
 
     account.delete(conn);

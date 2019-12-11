@@ -1,10 +1,11 @@
 use chrono::prelude::*;
-use nickel::{MiddlewareResult, Request, Response};
-use std::sync::mpsc::{self, Sender, Receiver};
+use nickel::{Nickel, MiddlewareResult, Request, Response};
+
+use crate::engine::config_engine::Config;
 
 // Logger middleware function: Once attached to the server this log every request details
 // TODO: Add more information in each request
-fn log_request<'mw>(req: &mut Request, res: Response<'mw>) -> MiddlewareResult<'mw> {
+fn log_request<'mw>(req: &mut Request<Config>, res: Response<'mw, Config>) -> MiddlewareResult<'mw, Config> {
     println!(
         "[DEBUG] {} {} {}",
         Utc::now().format("%b %e %T"),
@@ -15,7 +16,7 @@ fn log_request<'mw>(req: &mut Request, res: Response<'mw>) -> MiddlewareResult<'
 }
 
 // Attache the logger middleware to the server
-pub fn attache(server: &mut nickel::Nickel) {
+pub fn attache(server: &mut Nickel<Config>) {
     server.utilize(log_request);
 }
 

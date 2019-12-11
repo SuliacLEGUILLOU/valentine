@@ -15,7 +15,8 @@ Thing are gathered in the resource folder under their name.
 Each resource folder are build around the following files:
 
 - controller: Manage the routing and the basic control of the resource
-- model: Contain the database and api internal structure of the resource.
+- model: Contain the database and api internal structure of the resource
+- rule_set: Define all the rules linked to this resource to the authorization_engine. Rules can be used in the entire project
 
 ### Presenter
 
@@ -34,7 +35,6 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Websocket
 - Log level and main thread logger
 - Session engine improvement (Session renew, update, deletion and expiry)
-- Authorization engine
 - Customize error output to make it RESTFull
 
 ### Until decent system
@@ -50,6 +50,7 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 - Some documentations
 - Complete implementation for the JWT security (Key rotation, secondary token)
 - Output format based on request Accept header
+- Create macro helper to load session and database connection
 
 ### Current question
 
@@ -60,3 +61,7 @@ Presentation is manage inside the model structure with the help of the [Serde cr
 
 - Make an example of template use
 - Have the front be a Rust WebAssembly app
+
+## External documentation
+
+[Testing JWT security](https://github.com/ticarpi/jwt_tool/wiki)

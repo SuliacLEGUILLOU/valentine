@@ -9,6 +9,10 @@ pub fn generate_id() -> String {
     Uuid::new_v4().to_string()
 }
 
+pub fn empty_string() -> String {
+    "".to_string()
+}
+
 pub fn test_empty_vec<T>(v: &Vec<T>) -> bool {
     v.len() == 0
 }
@@ -20,6 +24,11 @@ mod tests {
     #[test]
     fn test_generate_id() {
         assert_eq!(generate_id().len(), 36);
+    }
+
+    #[test]
+    fn test_empty_string() {
+        assert_eq!(empty_string().len(), 0);
     }
 
     #[test]

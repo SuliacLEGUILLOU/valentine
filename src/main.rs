@@ -13,7 +13,7 @@ extern crate plugin;
 extern crate rand;
 extern crate typemap;
 
-use nickel::{Mountable, Nickel, StaticFilesHandler};
+use nickel::{Mountable, Nickel, StaticFilesHandler, Router};
 use nickel_postgres::PostgresMiddleware;
 use r2d2::Pool;
 use r2d2_postgres::{PostgresConnectionManager, TlsMode};
@@ -27,10 +27,12 @@ pub mod engine;
 use engine::log_engine::{self, Logger};
 use engine::response_engine;
 use engine::session_engine;
+use engine::config_engine::Config;
 
 fn main() {
-    let mut server = Nickel::new();
-    let mut router = Nickel::router();
+    let conf = Config::new();
+    let mut server = Nickel::with_data(conf);
+    let mut router: Router<Config> = Nickel::router();
 
     let addr = env::var("ADDR").unwrap();
     let port = env::var("PORT").unwrap();
