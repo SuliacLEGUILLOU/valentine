@@ -24,7 +24,7 @@ pub mod resource;
 use resource::account::controller as account_controller;
 
 pub mod engine;
-use engine::log_engine;
+use engine::log_engine::{self, Logger};
 use engine::response_engine;
 use engine::session_engine;
 
@@ -36,6 +36,9 @@ fn main() {
     let port = env::var("PORT").unwrap();
     let db_uri = env::var("DB_URI").unwrap();
     let session_secret = env::var("SESSION_SECRET").unwrap();
+
+    let logger = Logger::new();
+    logger.debug("Hello?".to_string());
 
     // Serve front end
     // TODO: Disable this for CDN settings?

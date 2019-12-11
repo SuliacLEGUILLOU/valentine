@@ -1,4 +1,4 @@
-use nickel::hyper::header::{ContentEncoding, Encoding, Headers};
+use nickel::hyper::header::{ContentEncoding, Encoding};
 use nickel::{MediaType, MiddlewareResult, Request, Response};
 
 use crate::plugin::Extensible;
@@ -8,7 +8,7 @@ use crate::engine::utils::test_empty_vec;
 use crate::resource::account::model::Model as Account;
 
 use libflate::gzip::Encoder;
-use std::io::{self, Read};
+use std::io;
 
 #[derive(Serialize)]
 pub struct BodyResponse {
@@ -54,7 +54,7 @@ fn get_json(res: &Response) -> String {
 }
 
 /**
- * Finalize the request by putting it into the JSON format
+ * Finalize the request by putting it into the JSON format and compressing it
  * TODO: This can easily be expanded to support more output format based on req header
  */
 fn finalize_request<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
